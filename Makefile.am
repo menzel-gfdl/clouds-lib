@@ -1,9 +1,9 @@
 lib_LTLIBRARIES = libclouds.la
 
-AM_CPPFLAGS = -I$(top_srcdir)/src
+AM_CPPFLAGS = -Isrc
 
 #Cloud optics library.
-clouds = $(top_srcdir)/src
+clouds = src
 libclouds_la_SOURCES = $(clouds)/c_bindings.f90 \
                        $(clouds)/hu_stamnes.f90 \
                        $(clouds)/ice_cloud_optics.f90 \
