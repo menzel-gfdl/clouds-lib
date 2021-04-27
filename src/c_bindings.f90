@@ -5,7 +5,7 @@ use hu_stamnes, only: HuStamnes
 use ice_cloud_optics, only: IceCloudOptics
 use incomplete_beta, only: IncompleteBeta
 use optics_utils, only: OpticalProperties
-use stochastic_clouds, only: TotalWaterPDF
+use stochastic_clouds, only: overlap_parameter, TotalWaterPDF
 
 implicit none
 private
@@ -97,15 +97,15 @@ function cloud_optics(num_bands, band_centers, band_limits, num_layers, &
   result(error_code) &
   bind(c, name="cloud_optics")
 
-  integer(kind=c_int), intent(in) :: num_bands !< Number of output bands.
+  integer(kind=c_int), value, intent(in) :: num_bands !< Number of output bands.
   real(kind=c_double), dimension(num_bands), intent(in) :: band_centers !< Center of output bands [cm-1].
   real(kind=c_double), dimension(num_bands + 1), intent(in) :: band_limits !< Limits of output bands [cm-1].
-  integer(kind=c_int), intent(in) :: num_layers !< Number of layers in the column.
+  integer(kind=c_int), value, intent(in) :: num_layers !< Number of layers in the column.
   real(kind=c_double), dimension(num_layers), intent(in) :: mean_cloud_fraction !< Grid box mean cloud fraction.
   real(kind=c_double), dimension(num_layers), intent(in) :: mean_liquid_content !< Grid box mean liquid cloud content.
   real(kind=c_double), dimension(num_layers), intent(in) :: mean_ice_content !< Grid box mean ice cloud content.
   real(kind=c_double), dimension(num_layers - 1), intent(in) :: overlap !< Overlap parameter for adjacent layers.
-  real(kind=c_double), intent(in) :: liquid_radius !< Liquid droplet radius [microns].
+  real(kind=c_double), value, intent(in) :: liquid_radius !< Liquid droplet radius [microns].
   real(kind=c_double), dimension(num_layers), intent(in) :: temperature !< Layer temperature [K].
   real(kind=c_double), dimension(num_bands, num_layers), intent(inout) :: beta_liquid !< Liquid cloud extinction coefficient [m-1].
   real(kind=c_double), dimension(num_bands, num_layers), intent(inout) :: omega_liquid !< Liquid cloud single-scatter albedo.
@@ -163,9 +163,9 @@ function calculate_overlap(num_layers, altitude, scale_length, alpha) &
   result(error_code) &
   bind(c, name="calculate_overlap")
 
-  integer(kind=c_int), intent(in) :: num_layers !< Number of layers.
+  integer(kind=c_int), value, intent(in) :: num_layers !< Number of layers.
   real(kind=c_double), dimension(num_layers), intent(in) :: altitude !< Layer altitude [km].
-  real(kind=c_double), intent(in) :: scale_length !< Scale length [km].
+  real(kind=c_double), value, intent(in) :: scale_length !< Scale length [km].
   real(kind=c_double), dimension(num_layers - 1), intent(out) :: alpha !< Overlap parameter between adjacent layers.
   integer(kind=c_int) :: error_code !< Error code.
 

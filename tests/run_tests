@@ -1,0 +1,11 @@
+#!/bin/bash -ex
+
+if [ ! -f "era5-inputs.tar.gz" ]; then
+  wget ftp://ftp2.gfdl.noaa.gov/perm/Raymond.Menzel/era5-inputs.tar.gz
+fi
+if [ ! -d "era5-inputs" ]; then
+  tar xvfz era5-inputs.tar.gz
+fi
+
+../ctest era5-inputs/beta_distribution.nc era5-inputs/clouds/chou_suarez.nc \
+         era5-inputs/clouds/hu_stamnes.nc
