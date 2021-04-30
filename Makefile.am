@@ -1,6 +1,6 @@
-lib_LTLIBRARIES = libclouds.la
+lib_LTLIBRARIES = libclouds.la libcloudsc.la
 
-AM_CPPFLAGS = -Isrc
+AM_CPPFLAGS = -Isrc -Isrc/c-files
 
 #Cloud optics library.
 clouds = src
@@ -29,7 +29,18 @@ $(clouds)/stochastic_clouds.lo: $(clouds)/incomplete_beta.lo
 
 check_PROGRAMS = ctest
 ctest_SOURCES = tests/c-test.c
-ctest_LDADD = $(top_builddir)/libclouds.la -lnetcdff
+ctest_LDADD = $(top_builddir)/libcloudsc.la -lnetcdff -lnetcdf
+
+
+libcloudsc_la_SOURCES = src/c-files/clouds_lib.c \
+                        src/c-files/hu_stamnes.c \
+                        src/c-files/ice_cloud_optics.c \
+                        src/c-files/incomplete_beta.c \
+                        src/c-files/netcdf_utils.c \
+                        src/c-files/optics_utils.c \
+                        src/c-files/stochastic_clouds.c
+
+
 
 
 CLEANFILES = *.mod *__genmod.f90
