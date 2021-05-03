@@ -45,8 +45,8 @@ static double interp(double const * x, double const * y, double const newx)
 void thick_average(OpticalProperties_t const self, OpticalProperties_t * optics,
                    int const * starting_band, int const * ending_band)
 {
-    int const a = starting_band == NULL ? 0 : *starting_band;
-    int const b = ending_band == NULL ? self.num_bands - 1 : *ending_band;
+    int const a = starting_band == NULL ? 0 : *starting_band - 1;
+    int const b = ending_band == NULL ? self.num_bands - 1 : *ending_band - 1;
 
     /*Linearly interpolate for now.*/
     int i;

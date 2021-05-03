@@ -46,22 +46,13 @@ static double ice_particle_size(double const temperature)
 
 
 /* @brief Calculates cloud optics.*/
-static void optics_(IceCloudOptics_t const self, double const ice_concentration,
-                    double const equivalent_radius, double const scale_factor,
-                    double const temperature, int const band,
-                    double * extinction_coefficient, double * single_scatter_albedo,
-                    double * asymmetry_factor)
+static void optics(IceCloudOptics_t const self, double const ice_concentration,
+                   double const equivalent_radius, double const scale_factor,
+                   double const temperature, int const band,
+                   double * extinction_coefficient, double * single_scatter_albedo,
+                   double * asymmetry_factor)
 {
-    double radius;
-    if (equivalent_radius > 0.)
-    {
-        radius = equivalent_radius;
-    }
-    else
-    {
-        radius = ice_particle_size(temperature);
-    }
-
+    double radius = equivalent_radius > 0. ? equivalent_radius : ice_particle_size(temperature);
     int r;
     for (r=1; r<self.num_radius_bins; ++r)
     {
@@ -89,7 +80,7 @@ static void optics_(IceCloudOptics_t const self, double const ice_concentration,
         asum += self.a[band*self.num_order + i]*d_inv[i];
     }
     *extinction_coefficient = ice_concentration*asum;
-    if (band <= self.last_ir_band)
+    if (band < self.last_ir_band)
     {
         double bsum = 0.;
         for (i=0; i<self.num_order; ++i)
@@ -132,7 +123,7 @@ void construct_ice_optics(IceCloudOptics_t * self, char const * path)
     {
         self->bands[i] = 0.5*(self->band_limits[2*i] + self->band_limits[2*i + 1]);
     }
-    read_attribute(ncid, "band_bnds", "last_IR_band", &self->last_ir_band);
+    read_attribute(ncid, "band_bnds", "last_IR_band", NC_INT, &(self->last_ir_band));
     read_variable(ncid, "a", (void **)&(self->a), NC_DOUBLE, NULL, NULL);
     read_variable(ncid, "b", (void **)&(self->b), NC_DOUBLE, NULL, NULL);
     read_variable(ncid, "c", (void **)&(self->c), NC_DOUBLE, NULL, NULL);
@@ -162,10 +153,10 @@ void calculate_ice_optics(IceCloudOptics_t const self, double const ice_concentr
     int i;
     for (i=0; i<self.num_bands; ++i)
     {
-        optics_(self, ice_concentration, equivalent_radius, scale_factor, temperature, i,
-                &(optical_properties->extinction_coefficient[i]),
-                &(optical_properties->single_scatter_albedo[i]),
-                &(optical_properties->asymmetry_factor[i]));
+        optics(self, ice_concentration, equivalent_radius, scale_factor, temperature, i,
+               &(optical_properties->extinction_coefficient[i]),
+               &(optical_properties->single_scatter_albedo[i]),
+               &(optical_properties->asymmetry_factor[i]));
     }
     return;
 }

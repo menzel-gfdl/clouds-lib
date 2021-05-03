@@ -27,9 +27,11 @@ $(clouds)/slingo.lo: $(clouds)/optics_utils.lo \
 $(clouds)/stochastic_clouds.lo: $(clouds)/incomplete_beta.lo
 
 
-check_PROGRAMS = ctest
+check_PROGRAMS = ctest ftest
 ctest_SOURCES = tests/c-test.c
-ctest_LDADD = $(top_builddir)/libcloudsc.la -lnetcdff -lnetcdf
+ctest_LDADD = $(top_builddir)/libcloudsc.la -lnetcdf
+ftest_SOURCES = tests/c-test.c
+ftest_LDADD = $(top_builddir)/libclouds.la -lnetcdff
 
 
 libcloudsc_la_SOURCES = src/c-files/clouds_lib.c \

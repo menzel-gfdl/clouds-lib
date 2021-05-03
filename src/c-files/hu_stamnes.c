@@ -1,5 +1,6 @@
 /* @brief Hu and Stamnes cloud liquid water parameterization from
           doi: 10.1175/1520-0442(1993)006<0728:AAPOTR>2.0.CO;2*/
+#include <math.h>
 #include <stdlib.h>
 #include <string.h>
 #include "hu_stamnes.h"
@@ -9,15 +10,15 @@
 
 
 /* @brief Calculates cloud optics.*/
-static void optics_(HuStamnes_t const self, double const water_concentration,
-                    double const equivalent_radius, int const band,
-                    double * extinction_coefficient, double * single_scatter_albedo,
-                    double * asymmetry_factor)
+static void optics(HuStamnes_t const self, double const water_concentration,
+                   double const equivalent_radius, int const band,
+                   double * extinction_coefficient, double * single_scatter_albedo,
+                   double * asymmetry_factor)
 {
     double r = self.min_radius > equivalent_radius ? self.min_radius : equivalent_radius;
     r = self.max_radius < r ? self.max_radius : r;
     int i;
-    for (i=1; i<=self.num_radius_bins; ++i)
+    for (i=1; i<self.num_radius_bins; ++i)
     {
         if (self.radii[i] > r) break;
     }
@@ -37,9 +38,9 @@ void construct_liquid_optics(HuStamnes_t * self, char const * path)
     int ncid = open_dataset(path);
     char name[128];
     memset(name, '\0', 128);
-    read_attribute(ncid, "radius", "bounds", name);
+    read_attribute(ncid, "radius", "bounds", NC_CHAR, name);
     float radii[2];
-    read_attribute(ncid, "radius", "valid_range", radii);
+    read_attribute(ncid, "radius", "valid_range", NC_FLOAT, radii);
     self->min_radius = (double)(radii[0]);
     self->max_radius = (double)(radii[1]);
     double * radius_bounds;
@@ -56,7 +57,7 @@ void construct_liquid_optics(HuStamnes_t * self, char const * path)
     free(radius_bounds);
     read_variable(ncid, "band_bnds", (void **)&(self->band_limits), NC_DOUBLE,
                   NULL, NULL);
-    read_attribute(ncid, "band_bnds", "last_IR_band", &self->last_ir_band);
+    read_attribute(ncid, "band_bnds", "last_IR_band", NC_INT, &self->last_ir_band);
     read_variable(ncid, "band", (void **)&(self->bands), NC_DOUBLE, NULL, NULL);
     read_variable(ncid, "a1", (void **)&(self->a1), NC_DOUBLE, NULL, NULL);
     read_variable(ncid, "a2", (void **)&(self->a2), NC_DOUBLE, NULL, NULL);
@@ -96,13 +97,13 @@ void calculate_liquid_optics(HuStamnes_t const self, double const water_concentr
                              double const equivalent_radius,
                              OpticalProperties_t * optical_properties)
 {
-  int i;
-  for (i=0; i<self.num_bands; ++i)
-  {
-      optics_(self, water_concentration, equivalent_radius, i,
-              &(optical_properties->extinction_coefficient[i]),
-              &(optical_properties->single_scatter_albedo[i]),
-              &(optical_properties->asymmetry_factor[i]));
-  }
-  return;
+    int i;
+    for (i=0; i<self.num_bands; ++i)
+    {
+        optics(self, water_concentration, equivalent_radius, i,
+               &(optical_properties->extinction_coefficient[i]),
+               &(optical_properties->single_scatter_albedo[i]),
+               &(optical_properties->asymmetry_factor[i]));
+    }
+    return;
 }

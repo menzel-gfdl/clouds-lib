@@ -117,7 +117,6 @@ function cloud_optics(num_bands, band_centers, band_limits, num_layers, &
 
   integer(kind=c_int) :: i
   real(kind=c_double), dimension(num_layers) :: ice_content
-  type(OpticalProperties) :: ice_optics
   real(kind=c_double), dimension(num_layers) :: liquid_content
   type(OpticalProperties) :: remapped_ice_optics
   type(OpticalProperties) :: remapped_liquid_optics

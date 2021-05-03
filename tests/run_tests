@@ -8,4 +8,7 @@ if [ ! -d "era5-inputs" ]; then
 fi
 
 ../ctest era5-inputs/beta_distribution.nc era5-inputs/clouds/chou_suarez.nc \
-         era5-inputs/clouds/hu_stamnes.nc
+         era5-inputs/clouds/hu_stamnes.nc c-output.nc
+
+../ftest era5-inputs/beta_distribution.nc era5-inputs/clouds/chou_suarez.nc \
+         era5-inputs/clouds/hu_stamnes.nc f-output.nc

@@ -1,4 +1,5 @@
 /* @brief Subcolumn generator for calculating stochastic clouds.*/
+#include <math.h>
 #include <stdlib.h>
 #include "incomplete_beta.h"
 #include "stochastic_clouds.h"

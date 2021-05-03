@@ -20,12 +20,13 @@ void help(char const * name)
     fprintf(stderr, "beta_path:\t\tPath to beta-distribution input file.\n");
     fprintf(stderr, "ice_path:\t\tPath to ice cloud parameterization input file.\n");
     fprintf(stderr, "liquid_path:\t\tPath to liquid cloud parameterization input file.\n");
+    fprintf(stderr, "output_path:\t\tPath to output file.\n");
 }
 
 
 int main(int argc, char **argv)
 {
-    char *pos_args[3] = {NULL, NULL, NULL};
+    char *pos_args[4] = {NULL, NULL, NULL, NULL};
     int num_args = 0;
     int i;
     for (i=1; i<argc; ++i)
@@ -41,7 +42,7 @@ int main(int argc, char **argv)
             num_args++;
         }
     }
-    if (num_args != 3)
+    if (num_args != 4)
     {
         usage(argv[0]);
         return 1;
@@ -49,11 +50,12 @@ int main(int argc, char **argv)
     char const * beta_path = pos_args[0];
     char const * ice_path = pos_args[1];
     char const * liquid_path = pos_args[2];
+    char const * output_path = pos_args[3];
 
     /*Initialize library.*/
     initialize_clouds_lib(beta_path, ice_path, liquid_path, NULL);
 
-    /*CIRC case 7 input data.*/
+    /*CIRC case 6 input data.*/
     int const num_layers = 69;
     double pressure[num_layers] = {
         0.1, 0.17, 0.25, 0.33, 0.43, 0.55, 0.71, 0.91, 1.17, 1.51, 
@@ -74,7 +76,7 @@ int main(int argc, char **argv)
         276.36, 276.83, 276.99, 276.66, 276.52, 276.23, 275.14, 274.7, 274.79, 
         275.11, 275.45, 275.84, 276.21, 276.64, 277.57, 278.54};
     double cloud_fraction[num_layers] = {
-        0., 0., 0., 0., 0., 0., 0., 0., 0., 0., 0., 0., 0., 0., 0., 0., 0., 0., 0., 0.,
+        1., 1., 1., 0., 0., 0., 0., 0., 0., 0., 0., 0., 0., 0., 0., 0., 0., 0., 0., 0.,
         0., 0., 0., 0., 0., 0., 0., 0., 0., 0., 0., 0., 0., 0., 0., 0., 0., 0., 0., 0.,
         0., 0., 0., 0., 0., 0., 0., 0., 1., 1., 1., 1., 1., 1., 1., 1., 1., 1., 1., 1.,
         1., 1., 1., 1., 1., 1., 1., 0., 0.};
@@ -85,10 +87,30 @@ int main(int argc, char **argv)
         7.71, 8.26, 14.65, 19.98, 26.55, 18.66, 16.72, 14.17, 11.86, 10.1, 8.73, 7.16,
         0.9, 0., 0.};
     double ice_content[num_layers] = {
-        0., 0., 0., 0., 0., 0., 0., 0., 0., 0., 0., 0., 0., 0., 0., 0., 0., 0., 0., 0.,
+        2., 3., 4., 0., 0., 0., 0., 0., 0., 0., 0., 0., 0., 0., 0., 0., 0., 0., 0., 0.,
         0., 0., 0., 0., 0., 0., 0., 0., 0., 0., 0., 0., 0., 0., 0., 0., 0., 0., 0., 0.,
         0., 0., 0., 0., 0., 0., 0., 0., 0., 0., 0., 0., 0., 0., 0., 0., 0., 0., 0., 0.,
         0., 0., 0., 0., 0., 0., 0., 0., 0.};
+    double plev[num_layers + 1] = {
+        0.07, 0.13, 0.22, 0.29, 0.37, 0.48, 0.62, 0.8, 1.02, 1.31, 
+        1.69, 2.2, 2.87, 3.86, 5.05, 6.53, 8.66, 11.97, 15.02, 18.8, 23.61, 
+        29.72, 36.03, 45.91, 58.62, 74.86, 95.48, 121.61, 142.79, 167.49, 196.77, 
+        230.61, 269.1, 290.28, 312.8, 336.65, 361.78, 388.28, 416.28, 445.89, 
+        476.99, 509.86, 544.63, 581.3, 620.02, 661.02, 704.27, 749.83, 788.1, 
+        797.9, 807.9, 817.97, 828.2, 838.5, 848.87, 859.4, 869.92, 880.72, 
+        891.64, 902.7, 909.71, 916.79, 924.01, 931.13, 938.24, 945.6, 953.03, 
+        960.24, 975.22, 981.7};
+
+/*
+    double thickness[num_layers];
+    for (i=0; i<num_layers; ++i)
+    {
+        thickness[i] = (abs(log(plev[i]) - log(plev[i + 1]))*temperature[i]*8.314462)/
+                       ((29.9647/1000.)*9.81);
+        liquid_content[i] /= thickness[i];
+        ice_content[i] /= thickness[i];
+    }
+*/
 
     /*Calculate overlap.*/
     double altitude[num_layers];
@@ -123,7 +145,7 @@ int main(int argc, char **argv)
 
     /*Write output to a file for now.*/
     int ncid;
-    nc_create("output.nc", NC_CLOBBER|NC_NETCDF4, &ncid);
+    nc_create(output_path, NC_CLOBBER|NC_NETCDF4, &ncid);
     int pressure_dimid;
     nc_def_dim(ncid, "pressure", (size_t)num_layers, &pressure_dimid);
     int varid;

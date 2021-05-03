@@ -17,7 +17,8 @@ void close_dataset(int const ncid);
 
 
 /* @brief Reads an attribute from netCDF dataset.*/
-void read_attribute(int const ncid, char const * variable, char const * name, void * buffer);
+void read_attribute(int const ncid, char const * variable, char const * name,
+                    nc_type const type, void * buffer);
 
 
 /* @brief Read the length of a dimension from a netCDF dataset.*/
