@@ -76,7 +76,7 @@ void overlap_parameter(int const num_layers, double const * altitude,
     int i;
     for (i=0; i<num_layers - 1; ++i)
     {
-        alpha[i] = exp(-1.*abs(altitude[i] - altitude[i + 1])/scale_length);
+        alpha[i] = exp(-1.*fabs(altitude[i] - altitude[i + 1])/scale_length);
     }
     return;
 }
