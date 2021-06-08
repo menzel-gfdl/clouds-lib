@@ -15,7 +15,7 @@ void construct_beta(IncompleteBeta_t * self, char const * path)
     read_variable(ncid, "q", (void **)&(self->q), NC_INT, NULL, NULL);
     read_variable(ncid, "x", (void **)&(self->x), NC_DOUBLE, NULL, NULL);
     read_variable(ncid, "data", (void **)&(self->y), NC_DOUBLE, NULL, NULL);
-    read_variable(ncid, "data", (void **)&(self->y_inverse), NC_DOUBLE, NULL, NULL);
+    read_variable(ncid, "inverse", (void **)&(self->y_inverse), NC_DOUBLE, NULL, NULL);
     close_dataset(ncid);
     return;
 }
